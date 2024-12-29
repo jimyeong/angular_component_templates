@@ -1,3 +1,14 @@
+# Used Material Angular Components
+
+1. Sidebar Darkmode, Lightmode toggle
+2. Sidebar with multiple pages
+3. Sidebar with multiple pages and subpages
+4. template for quick start for a project
+5. responsive application.
+
+
+
+
 # Components
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.11.
