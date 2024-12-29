@@ -1,4 +1,4 @@
-# Used Material Angular Components
+# Angular Template Components
 
 1. Sidebar Darkmode, Lightmode toggle
 2. Sidebar with multiple pages
