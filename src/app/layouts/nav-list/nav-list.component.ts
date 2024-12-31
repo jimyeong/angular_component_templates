@@ -1,15 +1,23 @@
 import { Component } from '@angular/core';
 
 import {MatListModule} from '@angular/material/list';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-nav-list',
   standalone: true,
-  imports: [MatListModule],
+  imports: [MatListModule, RouterModule],
   template: `
- <mat-list role="list">
-  <mat-list-item role="listitem">Item 1</mat-list-item>
-  <mat-list-item role="listitem">Item 2</mat-list-item>
-  <mat-list-item role="listitem">Item 3</mat-list-item>
+ <mat-list role="list"> 
+  <mat-list-item role="listitem">
+    <a [routerLink]="['/']">Home</a>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <a [routerLink]="['/details/1']">Details</a>
+  </mat-list-item>
+  <mat-list-item role="listitem">
+    <a [routerLink]="['/schedules']">Schedules</a>
+  </mat-list-item>
 </mat-list>
   `,
   styleUrl: './nav-list.component.scss'
