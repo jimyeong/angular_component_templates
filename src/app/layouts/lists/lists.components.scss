@@ -1,0 +1,14 @@
+$padding-value: 120px;
+li.list--buttons{
+    .li__inner{
+        padding: 10px 8px;
+        position: relative;
+        padding-right: $padding-value;
+    }
+    .button__container{
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}

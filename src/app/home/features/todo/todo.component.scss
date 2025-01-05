@@ -1,0 +1,54 @@
+
+$button-color: #08c;
+.Todos__list{
+    position: relative;
+}
+
+.li__inner{
+    position: relative;
+    padding-right: 120px;
+}
+.button__container{
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.Todos__icon{
+    display: inline-block;
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    &.button__edit{
+        margin-right: 10px;
+        background-color: $button-color;
+        &:hover{
+            background-color: darken($button-color, 10%);
+        }  
+        &:active{
+            background-color: lighten($button-color, 10%);
+        }
+    }   
+    &.button__delete{
+        margin-left: 10px;
+        background-color: red;
+        &:hover{
+            background-color: darken(red, 10%);
+        }
+        &:active{
+            background-color: lighten(red, 10%);
+        }
+    }
+}
+
+mat-icon.icon{
+    height: 100%;
+    &:before{
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
