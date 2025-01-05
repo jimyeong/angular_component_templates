@@ -8,7 +8,7 @@ import { Todo } from '../../models';
   template: `
   <div class="Todos__item">
     <div class="li__inner">
-      <!-- <h2>{{todo.title}}</h2> -->
+      <h2>{{todo.title}}</h2>
     </div>
   </div>`,
 })
