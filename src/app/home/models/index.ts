@@ -5,4 +5,5 @@ export interface Todo {
     description: string;
     completed: boolean;
     createdAt: Date;
+    isEditing: boolean;
 }

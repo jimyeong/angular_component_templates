@@ -1,8 +1,7 @@
-
 import { Component, inject } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 
 import { MatDividerModule } from '@angular/material/divider';
 import { ParagraphsComponent } from '../layouts/texts/paragraphs/paragraphs.component';
@@ -15,7 +14,7 @@ import { MatGridTile } from '@angular/material/grid-list';
 @Component({
   selector: 'app-home.component',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, ParagraphsComponent, TodoComponent, MatGridListModule, MatGridTile],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatDividerModule, ParagraphsComponent, TodoComponent, MatGridListModule, MatGridTile, ReactiveFormsModule],
   template: `
 
   <h1>{{this.title}}</h1>
@@ -25,7 +24,7 @@ import { MatGridTile } from '@angular/material/grid-list';
   </paragraphs>
   <mat-grid-list cols="2" rowHeight="2:1">
     <mat-grid-tile>
-      <todo [todos]="todos"/>
+      <todo [formGroup]="newTodoForm" [todos]="todos"/>
     </mat-grid-tile>
   </mat-grid-list>
 
@@ -37,11 +36,24 @@ export class HomeComponent {
   title = 'My Todos';
   homeService = inject(HomeServiceTsService);
   todos: Todo[] = [];
+  newTodoForm = new FormGroup({
+    title: new FormControl(''),
+  });
   constructor() {
-    console.log("@@1", this.todos);
   }
   async ngOnInit() {
-    this.todos = await this.homeService.getTodos()
-    console.log("@@2", this.todos);
+    this.getTodos()
+  }
+  getTodos(){
+    this.homeService.getTodos().then((todos) => {
+      this.todos = todos;
+    })
+  }
+  addTodo(){
+    this.homeService.addTodo({
+      title: this.newTodoForm.value.title || '',
+      completed: false,
+      createdAt: new Date(),
+    })
   }
 }

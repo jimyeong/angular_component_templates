@@ -3,7 +3,9 @@ $button-color: #08c;
 .Todos__list{
     position: relative;
 }
-
+.Todo__form{
+    width: 100%;
+}
 .li__inner{
     position: relative;
     padding-right: 120px;
