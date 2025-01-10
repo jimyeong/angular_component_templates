@@ -81,20 +81,14 @@ export class TodoComponent {
     // processing the component's job
     this.formGroup.reset();
   }
-
   onClickEdit(id:string){
+    //search with the id
     const todo = this.todos.find(todo => todo.id === id);
     todo && (todo.isEditing = true);
-    // this.editingForm.patchValue({
-    //   id: id,
-    //   title: todo!.title,
-    //   ...todo,
-    // })
-    // this.todos = [...this.todos];
+    this.todos = [...this.todos];
   }
   onClickConfirm(id: string) {
-    // c onsole.log("What are these", this.editingForm.value);
-    
+    // if editing, then update the todo
     if(this.editingManager[id]){
       this.onEdit.emit({ id, payload: {
         id,
@@ -105,13 +99,6 @@ export class TodoComponent {
       }});
       this.editingManager[id] = '';
     }
-    
-    // const todo = this.todos.find(todo=>todo.id===id);
-    //todo!.isEditing = false;
-    // this.todos = [...this.todos, todo!];
-
-
-    
   }
   onClickDelete(id: string) {
     // call the controller
@@ -119,7 +106,7 @@ export class TodoComponent {
   }
   
   onClickCancel(id: string){
-    // processing the component's job
+    // find the id, and set it back to false on the item.
     const todo = this.todos.find(todo=>todo.id===id);
     todo && (todo.isEditing = !todo.isEditing);
     this.todos = [...this.todos];

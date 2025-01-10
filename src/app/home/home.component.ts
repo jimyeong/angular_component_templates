@@ -39,16 +39,16 @@ export class HomeComponent {
   newTodoForm = new FormGroup({
     title: new FormControl(''),
   });
-  constructor() {
-  }
   async ngOnInit() {
     this.getTodos()
   }
+  // read todos from the server
   getTodos(){
     this.homeService.getTodos().then((todos) => {
       this.todos = todos;
     })
   }
+  // create a todo
   addTodo(){
     this.homeService.addTodo({
       title: this.newTodoForm.value.title || '',
@@ -58,11 +58,14 @@ export class HomeComponent {
       this.todos = [...this.todos, todo];
     })
   }
+  // delete a todo
   deleteTodo(id:string){
     this.homeService.deleteTodo(id);
     this.todos = this.todos.filter(todo=>todo.id !== id);
     this.todos = [...this.todos];
   }
+  
+  // edit a todo  
   editTodo(id:string, payload: {}&EditableTodo){
     const body = {
       id,
@@ -71,10 +74,8 @@ export class HomeComponent {
       createdAt: payload.createdAt,
     }
     this.homeService.editTodo(id, body);
-    this.todos.map((todo, idx) =>({
-      ...todo,
-      title: payload.title,
-    }))
+    
+    // add todos
     this.todos = this.todos.map((todo, idx)=>{
       if(todo.id === id){
         todo.isEditing = !todo.isEditing;
