@@ -73,18 +73,16 @@ export class HomeComponent {
       completed: payload.completed,
       createdAt: payload.createdAt,
     }
-    this.homeService.editTodo(id, body);
-    
-    // add todos
-    this.todos = this.todos.map((todo, idx)=>{
-      if(todo.id === id){
-        todo.isEditing = !todo.isEditing;
-        todo.title= payload.title;
-        todo.completed = payload.completed; 
-        todo.createdAt = payload.createdAt;
+    this.homeService.editTodo(id, body).then((todo)=>{
+      this.todos = this.todos.map((todo, idx)=>{
+        if(todo.id === id){
+          todo.isEditing = !todo.isEditing;
+          todo.title= payload.title;
+          todo.completed = payload.completed; 
+          todo.createdAt = payload.createdAt;
+        };
         return todo;
-      };
-      return todo;
+      })
     })
   }
 }
