@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
-import { Todo } from '../../models';
-import {  NgFor, NgForOf} from '@angular/common';
+import { Todo , EditableTodo} from '../../models';
+import {  NgFor, NgForOf, NgClass, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
@@ -13,7 +13,7 @@ import { HomeServiceTsService } from '../../services/home.service';
 @Component({
   selector: 'todo',
   standalone: true,
-  imports: [NgFor, MatIconModule, MatDividerModule, MatButtonModule, MatInputModule, MatFormFieldModule, FormsModule, ReactiveFormsModule],
+  imports: [NgFor, NgClass,NgIf, MatIconModule, MatDividerModule, MatButtonModule, MatInputModule, MatFormFieldModule, FormsModule, ReactiveFormsModule],
   template: `<div class="Todos">
     <h1>Todos</h1>
     <div class="Todo__adding">
@@ -31,14 +31,23 @@ import { HomeServiceTsService } from '../../services/home.service';
 
     
       <ul class="Todo__list">
-        <li class="Todos__item" *ngFor="let todo of todos">
+        <li class="Todos__item" *ngFor="let todo of todos" [ngClass]="{'isEditing': todo.isEditing}">
           <div class="li__inner">
-            <h2>{{todo.title}}</h2>
-            <div class="button__container">
-              <span class="Todos__icon button__edit">
+            <h2 *ngIf="!todo.isEditing">{{todo.title}}</h2>
+            <input *ngIf="todo.isEditing"/>
+            <div *ngIf="todo.isEditing" class="button__container">
+              <span class="Todos__icon button__confirm" (click)="onClickEdit(todo.id)">
+                <mat-icon class="icon" aria-hidden="false" fontIcon="check"></mat-icon>
+              </span>
+              <span class="Todos__icon button__cancel" (click)="onClickCancel(todo.id)">
+                <mat-icon class="icon" aria-hidden="false" fontIcon="cancel"></mat-icon>
+              </span>
+            </div>
+            <div *ngIf="!todo.isEditing" class="button__container">
+              <span class="Todos__icon button__edit" (click)="onClickEdit(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="edit"></mat-icon>
               </span>
-              <span class="Todos__icon button__delete">
+              <span class="Todos__icon button__delete" (click)="onClickEdit(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="delete"></mat-icon>
               </span>
             </div>
@@ -51,7 +60,10 @@ import { HomeServiceTsService } from '../../services/home.service';
 })
 export class TodoComponent {
   @Input() formGroup!: FormGroup;
-  @Input() todos: Todo[] = [];
+  @Input() todos: EditableTodo[] = [];
+  @Input() onEdit!: (id: string) => void;
+  @Input() onDelete!: (id: string) => void;
+  @Input() onCancel!: (id: string) => void;
   homeService = inject(HomeServiceTsService);
   addTodo() {
     console.log(this.formGroup.value)
@@ -61,5 +73,22 @@ export class TodoComponent {
       createdAt: new Date()
     });
     this.formGroup.reset();
+  }
+
+  onClickEdit(id:string){
+    this.onEdit(id);
+    const todo = this.todos.find(todo => todo.id === id);
+    todo && (todo.isEditing = true);
+    this.todos = [...this.todos];
+  }
+  onClickDelete(id: string) {
+    this.onDelete(id);
+  }
+  
+  onClickCancel(id: string){
+    this.onCancel(id);
+    const todo = this.todos.find(todo=>todo.id===id);
+    todo && (todo.isEditing = !todo.isEditing);
+    this.todos = [...this.todos];
   }
 }

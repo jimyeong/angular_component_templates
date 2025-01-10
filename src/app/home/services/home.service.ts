@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Todo} from '../models';
+import {Todo, EditableTodo} from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class HomeServiceTsService {
   baseUrl = 'http://localhost:8080';
 
   constructor() { }
-  async getTodos():Promise<Todo[]>{
+  async getTodos():Promise<EditableTodo[]>{
     const data = await (await fetch(`${this.baseUrl}/todos`)).json()
     // console.log( await data.json());
     for(const todo of data){
@@ -33,4 +33,18 @@ export class HomeServiceTsService {
     })).json()
     return await data ||[];
   }
+  async editTodo(id: string, body: Todo){
+    const data = await (await fetch(`${this.baseUrl}/todos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    })).json()
+    return await data ||[]; 
+  }
+  async deleteTodo(id: string){
+    const data = await (await fetch(`${this.baseUrl}/todos/${id}`, {
+      method: 'DELETE',
+    })).json()
+    return await data ||[]; 
+  }
+  
 }

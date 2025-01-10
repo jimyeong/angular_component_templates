@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angul
 import { MatDividerModule } from '@angular/material/divider';
 import { ParagraphsComponent } from '../layouts/texts/paragraphs/paragraphs.component';
 import { HomeServiceTsService } from './services/home.service';
-import { Todo } from './models';
+import { Todo , EditableTodo } from './models';
 import { TodoComponent } from './features/todo/todo.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatGridTile } from '@angular/material/grid-list';
@@ -24,7 +24,7 @@ import { MatGridTile } from '@angular/material/grid-list';
   </paragraphs>
   <mat-grid-list cols="2" rowHeight="2:1">
     <mat-grid-tile>
-      <todo [formGroup]="newTodoForm" [todos]="todos"/>
+      <todo [formGroup]="newTodoForm" [todos]="todos" (onEdit)="editTodo($id)" (onDelete)="deleteTodo($id)" (onCancel)="cancelTodo($id)"/>
     </mat-grid-tile>
   </mat-grid-list>
 
@@ -35,7 +35,7 @@ import { MatGridTile } from '@angular/material/grid-list';
 export class HomeComponent {
   title = 'My Todos';
   homeService = inject(HomeServiceTsService);
-  todos: Todo[] = [];
+  todos: EditableTodo[] = [];
   newTodoForm = new FormGroup({
     title: new FormControl(''),
   });
@@ -55,5 +55,19 @@ export class HomeComponent {
       completed: false,
       createdAt: new Date(),
     })
+  }
+  deleteTodo(id:string){
+    this.homeService.deleteTodo(id);
+    this.todos = this.todos.filter(todo=>todo.id !== id);
+    this.todos = [...this.todos];
+  }
+  editTodo(id:string){
+    const body = {
+      id,
+      title: this.newTodoForm.value.title || '',
+      completed: false,
+      createdAt: new Date(),
+    }
+    this.homeService.editTodo(id, body)
   }
 }
