@@ -3,6 +3,12 @@ $button-color: #08c;
 .Todos__list{
     position: relative;
 }
+.Todos__item{
+    height: 52px;
+    & + &{
+        margin-top: 16px;
+    }
+}
 .Todo__form{
     width: 100%;
 }
@@ -10,7 +16,7 @@ $button-color: #08c;
     position: relative;
     padding-right: 120px;
 }
-.button__container{
+.btn__container{
     position: absolute;
     right: 0;
     top: 50%;
@@ -25,8 +31,9 @@ $button-color: #08c;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
-    &.button__edit{
-        margin-right: 10px;
+    margin-right: 10px;
+
+    &.btn__edit{
         background-color: $button-color;
         &:hover{
             background-color: darken($button-color, 10%);
@@ -34,9 +41,17 @@ $button-color: #08c;
         &:active{
             background-color: lighten($button-color, 10%);
         }
-    }   
-    &.button__delete{
-        margin-left: 10px;
+    }
+    &.btn__confirm{
+        background-color: green;
+        &:hover{
+            background-color: darken(green, 10%);
+        }
+        &:active{
+            background-color: lighten(green, 10%);
+        }
+    }
+    &.btn__delete{
         background-color: red;
         &:hover{
             background-color: darken(red, 10%);

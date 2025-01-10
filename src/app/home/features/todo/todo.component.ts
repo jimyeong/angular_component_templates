@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Todo , EditableTodo} from '../../models';
 import {  NgFor, NgForOf, NgClass, NgIf} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
@@ -20,34 +20,31 @@ import { HomeServiceTsService } from '../../services/home.service';
       <mat-form-field class="Todo__form form" [formGroup]="formGroup">
           <mat-label class="Todo__form">Add your todos</mat-label>
           <input matInput formControlName="title" />
-          <button (click)="addTodo()" class="btn" mat-fab extended>
+          <button (click)="onClickAdd()" class="btn" mat-fab extended>
             <mat-icon>favorite</mat-icon>
             Basic
           </button>
       </mat-form-field>
     </div>
-
     <mat-divider></mat-divider>
-
-    
       <ul class="Todo__list">
         <li class="Todos__item" *ngFor="let todo of todos" [ngClass]="{'isEditing': todo.isEditing}">
           <div class="li__inner">
             <h2 *ngIf="!todo.isEditing">{{todo.title}}</h2>
-            <input *ngIf="todo.isEditing"/>
-            <div *ngIf="todo.isEditing" class="button__container">
-              <span class="Todos__icon button__confirm" (click)="onClickEdit(todo.id)">
+            <input *ngIf="todo.isEditing" name={{todo.id}} value={{todo.title}} (input)="onInputChange($event)"/>
+            <div *ngIf="todo.isEditing" class="btn__container">
+              <span class="Todos__icon btn__confirm" (click)="onClickConfirm(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="check"></mat-icon>
               </span>
-              <span class="Todos__icon button__cancel" (click)="onClickCancel(todo.id)">
+              <span class="Todos__icon btn__cancel" (click)="onClickCancel(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="cancel"></mat-icon>
               </span>
             </div>
-            <div *ngIf="!todo.isEditing" class="button__container">
-              <span class="Todos__icon button__edit" (click)="onClickEdit(todo.id)">
+            <div *ngIf="!todo.isEditing" class="btn__container">
+              <span class="Todos__icon btn__edit" (click)="onClickEdit(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="edit"></mat-icon>
               </span>
-              <span class="Todos__icon button__delete" (click)="onClickEdit(todo.id)">
+              <span class="Todos__icon btn__delete" (click)="onClickDelete(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="delete"></mat-icon>
               </span>
             </div>
@@ -61,32 +58,68 @@ import { HomeServiceTsService } from '../../services/home.service';
 export class TodoComponent {
   @Input() formGroup!: FormGroup;
   @Input() todos: EditableTodo[] = [];
-  @Input() onEdit!: (id: string) => void;
-  @Input() onDelete!: (id: string) => void;
-  @Input() onCancel!: (id: string) => void;
+  
+  @Output() onAdd = new EventEmitter<void>();
+  @Output() onEdit = new EventEmitter<{id: string, payload:{}& EditableTodo}>();
+  @Output() onDelete = new EventEmitter<string>();
+  @Output() onCancel = new EventEmitter<string>();
   homeService = inject(HomeServiceTsService);
-  addTodo() {
-    console.log(this.formGroup.value)
-    this.homeService.addTodo({
-      title: this.formGroup.value.title || '',
-      completed: false,
-      createdAt: new Date()
-    });
+  editingManager: {
+    [key: string]: string;
+  } = {};
+  
+  onInputChange(event: any){
+    let val = event.target.value;
+    let id = event.target.name;
+    this.editingManager[id] = val;
+  }
+
+  onClickAdd() {
+    // call the controller
+    this.formGroup.value.title && this.onAdd.emit();
+
+    // processing the component's job
     this.formGroup.reset();
   }
 
   onClickEdit(id:string){
-    this.onEdit(id);
     const todo = this.todos.find(todo => todo.id === id);
     todo && (todo.isEditing = true);
-    this.todos = [...this.todos];
+    // this.editingForm.patchValue({
+    //   id: id,
+    //   title: todo!.title,
+    //   ...todo,
+    // })
+    // this.todos = [...this.todos];
+  }
+  onClickConfirm(id: string) {
+    // c onsole.log("What are these", this.editingForm.value);
+    
+    if(this.editingManager[id]){
+      this.onEdit.emit({ id, payload: {
+        id,
+        title: this.editingManager[id],
+        completed: false,
+        isEditing: false,
+        createdAt: new Date(),
+      }});
+      this.editingManager[id] = '';
+    }
+    
+    // const todo = this.todos.find(todo=>todo.id===id);
+    //todo!.isEditing = false;
+    // this.todos = [...this.todos, todo!];
+
+
+    
   }
   onClickDelete(id: string) {
-    this.onDelete(id);
+    // call the controller
+    this.onDelete.emit(id);
   }
   
   onClickCancel(id: string){
-    this.onCancel(id);
+    // processing the component's job
     const todo = this.todos.find(todo=>todo.id===id);
     todo && (todo.isEditing = !todo.isEditing);
     this.todos = [...this.todos];

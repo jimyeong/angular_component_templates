@@ -24,7 +24,7 @@ import { MatGridTile } from '@angular/material/grid-list';
   </paragraphs>
   <mat-grid-list cols="2" rowHeight="2:1">
     <mat-grid-tile>
-      <todo [formGroup]="newTodoForm" [todos]="todos" (onEdit)="editTodo($id)" (onDelete)="deleteTodo($id)" (onCancel)="cancelTodo($id)"/>
+      <todo [formGroup]="newTodoForm" [todos]="todos" (onEdit)="editTodo($event.id, $event.payload)" (onAdd)="addTodo()" (onDelete)="deleteTodo($event)"/>
     </mat-grid-tile>
   </mat-grid-list>
 
@@ -54,6 +54,8 @@ export class HomeComponent {
       title: this.newTodoForm.value.title || '',
       completed: false,
       createdAt: new Date(),
+    }).then((todo)=>{
+      this.todos = [...this.todos, todo];
     })
   }
   deleteTodo(id:string){
@@ -61,13 +63,28 @@ export class HomeComponent {
     this.todos = this.todos.filter(todo=>todo.id !== id);
     this.todos = [...this.todos];
   }
-  editTodo(id:string){
+  editTodo(id:string, payload: {}&EditableTodo){
     const body = {
       id,
-      title: this.newTodoForm.value.title || '',
-      completed: false,
-      createdAt: new Date(),
+      title: payload.title,
+      completed: payload.completed,
+      createdAt: payload.createdAt,
     }
-    this.homeService.editTodo(id, body)
+    this.homeService.editTodo(id, body);
+    this.todos.map((todo, idx) =>({
+      ...todo,
+      title: payload.title,
+    }))
+    this.todos = this.todos.map((todo, idx)=>{
+      if(todo.id === id){
+        todo.isEditing = !todo.isEditing;
+        todo.title= payload.title;
+        todo.completed = payload.completed; 
+        todo.createdAt = payload.createdAt;
+        return todo;
+      };
+      return todo;
+    })
   }
 }
+
