@@ -10,6 +10,8 @@ import { Todo , EditableTodo } from './models';
 import { TodoComponent } from './features/todo/todo.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatGridTile } from '@angular/material/grid-list';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @Component({
   selector: 'app-home.component',

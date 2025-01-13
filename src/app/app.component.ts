@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Component, NgModule } from '@angular/core';
 import { SideNavTsComponent } from './layouts/side-nav/side-nav.ts.component';
-import { routes } from './app.routes';
 import { RouterModule } from '@angular/router';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+@NgModule({
+  imports: [BrowserModule, BrowserAnimationsModule],
+  bootstrap: [],
+  declarations: [],
+})
 
 @Component({
   selector: 'app-root',
