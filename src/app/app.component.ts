@@ -3,11 +3,6 @@ import { SideNavTsComponent } from './layouts/side-nav/side-nav.ts.component';
 import { RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-@NgModule({
-  imports: [BrowserModule, BrowserAnimationsModule],
-  bootstrap: [],
-  declarations: [],
-})
 
 @Component({
   selector: 'app-root',

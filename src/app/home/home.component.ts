@@ -48,6 +48,7 @@ export class HomeComponent {
   getTodos(){
     this.homeService.getTodos().then((todos) => {
       this.todos = todos;
+      console.log(this.todos)
     })
   }
   // create a todo
