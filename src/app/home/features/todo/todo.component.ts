@@ -31,7 +31,7 @@ import { HomeServiceTsService } from '../../services/home.service';
         <li class="Todos__item" *ngFor="let todo of todos" [ngClass]="{'isEditing': todo.isEditing}">
           <div class="li__inner">
             <h2 *ngIf="!todo.isEditing">{{todo.title}}</h2>
-            <input *ngIf="todo.isEditing" name={{todo.id}} value={{todo.title}} (input)="onInputChange($event)"/>
+            <input *ngIf="todo.isEditing" name={{todo.id}} value={{todo.title}} (input)="onInputChange($event)" class="Todos__input"/>
             <div *ngIf="todo.isEditing" class="btn__container">
               <span class="Todos__icon btn__confirm" (click)="onClickConfirm(todo.id)">
                 <mat-icon class="icon" aria-hidden="false" fontIcon="check"></mat-icon>

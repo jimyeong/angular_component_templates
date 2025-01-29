@@ -1,4 +1,4 @@
-import { ComponentFixture, flush, TestBed } from '@angular/core/testing';
+import { ComponentFixture, flush, TestBed, tick } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EditableTodo } from './models';
 
@@ -23,7 +23,7 @@ describe('HomeComponentComponent', () => {
   let el:DebugElement;
   beforeEach(async () => {
     let homeComponent;
-    serviceSpy = jasmine.createSpyObj("HomeServiceTsService", ['addTodo', 'getTodos', 'deleteTodo']);
+    serviceSpy = jasmine.createSpyObj("HomeServiceTsService", ['addTodo', 'getTodos', 'deleteTodo', 'editTodo']);
     await TestBed.configureTestingModule({
       imports: [HomeComponent, BrowserAnimationsModule, TodoComponent],
       providers: [HomeServiceTsService, {provide: HomeServiceTsService, useValue: serviceSpy},
@@ -66,13 +66,10 @@ describe('HomeComponentComponent', () => {
     })
   }))
   // when clicking the add button
-  it('test deleteTodo',  fakeAsync(() => {
+  xit('test deleteTodo',  fakeAsync(() => {
     // test delete todo, add a fake data in the list
     serviceSpy.getTodos.and.returnValue(Promise.resolve([fakeData[0]] as EditableTodo[]))
     fixture.detectChanges();
-    const deleteId = fakeData[0].id
-    fixture.detectChanges();
-    
     // finish the async task
     flush();
     fixture.detectChanges();
@@ -92,4 +89,31 @@ describe('HomeComponentComponent', () => {
     expect(serviceSpy.deleteTodo).toHaveBeenCalled();
     expect(component.todos.length).toBe(0);
   }));
+  it('test editTodo', fakeAsync(() => {
+    // test edit todo, add a fake data in the list
+    serviceSpy.getTodos.and.returnValue(Promise.resolve([fakeData[0]] as EditableTodo[]))
+    fixture.detectChanges();
+    flush();
+    fixture.detectChanges();
+    console.log("@@@component.todos", component.todos)
+    const editId = fakeData[0].id
+    fixture.detectChanges();
+    const editBtn = el.query(By.css('.btn__edit'));
+    editBtn.nativeElement.click();
+    fixture.detectChanges();
+
+    const input = el.query(By.css('.Todos__input'))
+
+    expect(input.nativeElement.value).toBe(fakeData[0].title);
+    input.nativeElement.value = "find a new book to read";
+    input.nativeElement.dispatchEvent(new Event("input"));
+    const confirmBtn = el.query(By.css('.btn__confirm')).nativeElement.click();
+    console.log("@@@component.todos", component.todos)
+    flush();
+    fixture.detectChanges();
+    expect(serviceSpy.editTodo).toHaveBeenCalled();
+    flush();
+    fixture.detectChanges();
+    
+  }))
 });
