@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, flush, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EditableTodo } from './models';
 
@@ -9,6 +9,9 @@ import { HomeServiceTsService } from './services/home.service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { fakeData } from '../../fakeData';
 import { provideHttpClient } from '@angular/common/http';
+import { waitForAsync, fakeAsync } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 // reference https://stackoverflow.com/questions/74004016/unexpected-value-httptestingcontroller-imported-by-the-module-dynamictestmodu
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 describe('HomeComponentComponent', () => {
@@ -17,15 +20,13 @@ describe('HomeComponentComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let homeService: HomeServiceTsService;
   let serviceSpy: any;
-  let httpTestingController: HttpTestingController;
+  let el:DebugElement;
   beforeEach(async () => {
     let homeComponent;
-    // let serviceSpy = jasmine.createSpyObj('HomeServiceTsService', ['addTodo']);
     serviceSpy = jasmine.createSpyObj("HomeServiceTsService", ['addTodo', 'getTodos', 'deleteTodo']);
-
     await TestBed.configureTestingModule({
-      imports: [HomeComponent, BrowserAnimationsModule, TodoComponent, HttpTestingController],
-      providers: [HomeServiceTsService, {provide: HomeServiceTsService, useValue: serviceSpy}, provideHttpClient(), provideHttpClientTesting(),
+      imports: [HomeComponent, BrowserAnimationsModule, TodoComponent],
+      providers: [HomeServiceTsService, {provide: HomeServiceTsService, useValue: serviceSpy},
       ]
     })
     .compileComponents();
@@ -35,15 +36,12 @@ describe('HomeComponentComponent', () => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
     homeService = TestBed.inject(HomeServiceTsService);
-    httpTestingController = TestBed.inject(HttpTestingController);
-    
-
-    // serviceSpy.getTodos.and.returnValue(Promise.resolve(fakeData as EditableTodo[]))
+    el = fixture.debugElement;
       
-    
   });
-  it("test addTodo.", async () => {
+  it("test addTodo.", waitForAsync(async () => {
     // when the input is empty, the todo should not be added
+    serviceSpy.getTodos.and.returnValue(Promise.resolve(fakeData as EditableTodo[]))
     const button = fixture.nativeElement.querySelector('button')
     button.click();
     fixture.detectChanges();
@@ -59,27 +57,39 @@ describe('HomeComponentComponent', () => {
     expect(component.newTodoForm.value.title).toBe("reading books");
     fixture.detectChanges();
     button.click();
-    expect(homeService.addTodo).toHaveBeenCalled()
-    const req = httpTestingController.expectOne('http://localhost:8080/todos');
-    expect(req.request.method).toEqual('POST');
-  })
-  // when clicking the add button
-  xit('test deleteTodo', async () => {
+    fixture.detectChanges();
     
-    serviceSpy.getTodos.and.returnValue(Promise.resolve(fakeData as EditableTodo[]))
-    // add testing data in the list
-    // component.todos=[...component.todos, fakeData[0]]
+    fixture.whenStable().then(() => {
+      expect(homeService.addTodo).toHaveBeenCalled()
+      const lastIdx = component.todos.length - 1
+      expect(component.todos[lastIdx].title).toBe("reading books")
+    })
+  }))
+  // when clicking the add button
+  it('test deleteTodo',  fakeAsync(() => {
+    // test delete todo, add a fake data in the list
+    serviceSpy.getTodos.and.returnValue(Promise.resolve([fakeData[0]] as EditableTodo[]))
     fixture.detectChanges();
-    expect(component.todos.length).toBe(1);
-
-    // delete the testing data in the list
     const deleteId = fakeData[0].id
-    component.deleteTodo(deleteId)
     fixture.detectChanges();
+    
+    // finish the async task
+    flush();
+    fixture.detectChanges();
+
+    // test whether the the first fake data's title is the same as the added data's title
+    expect(component.todos.length).toBe(1);
+    expect(component.todos[0].title).toBe(fakeData[0].title);
+    fixture.detectChanges();
+
+    // find the delete button and click it
+    const deleteBtn = el.query(By.css('.btn__delete'));
+    deleteBtn.nativeElement.click();
+    flush();
+    fixture.detectChanges();
+
+    // check the item in the list with the id has disappeared
+    expect(serviceSpy.deleteTodo).toHaveBeenCalled();
     expect(component.todos.length).toBe(0);
-    expect(homeService.deleteTodo).toHaveBeenCalled()
-    // console.log("httpTestingController",httpTestingController);
-    // const req = httpTestingController.expectOne(`http://localhost:8080/todos/${deleteId}`);
-    //expect(req.request.method).toEqual('DELETE');
-  });
+  }));
 });
